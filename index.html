@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Felipe Meneguzzi — Backend Developer & Engineer</title>
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        /* CSS Reset & Fontes */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Teko:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #1ABC9C;
+            --secondary-color: #2c3e50;
+            --background-color: #0f172a; /* Azul bem escuro */
+            --card-background: #1e293b; /* Azul ardósia */
+            --text-color: #cbd5e1; /* Cinza claro */
+            --header-font: 'Teko', sans-serif;
+            --body-font: 'Roboto', sans-serif;
+            --border-color: rgba(26, 188, 156, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--body-font);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- Cabeçalho e Navegação --- */
+        header {
+            width: 100%; padding: 1rem 0; position: fixed;
+            top: 0; z-index: 1000; background-color: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px); transition: top 0.3s;
+        }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        nav .logo {
+            font-family: var(--header-font); font-size: 2.5rem;
+            color: var(--primary-color); text-transform: uppercase;
+        }
+        nav ul { list-style: none; display: flex; }
+        nav ul li a {
+            color: white; text-decoration: none; margin: 0 15px;
+            font-weight: bold; position: relative; padding: 5px 0;
+            transition: color 0.3s ease;
+        }
+        nav ul li a::after {
+            content: ''; position: absolute; width: 0; height: 2px;
+            bottom: 0; left: 0; background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        nav ul li a:hover { color: var(--primary-color); }
+        nav ul li a:hover::after { width: 100%; }
+
+        /* --- Seletor de Idioma --- */
+        .lang-selector button {
+            background: none; border: 1px solid var(--primary-color);
+            color: var(--primary-color); padding: 5px 10px;
+            margin-left: 5px; cursor: pointer; transition: all 0.3s ease;
+            border-radius: 5px; font-weight: bold;
+        }
+        .lang-selector button:hover, .lang-selector button.active {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
+        /* --- Seção Hero --- */
+        #hero {
+            height: 100vh; display: flex; align-items: center;
+            justify-content: center; text-align: center; flex-direction: column;
+        }
+        #hero h1 {
+            font-family: var(--header-font); font-size: 5rem;
+            color: white; margin: 0;
+        }
+        #hero .subtitle {
+            font-size: 1.5rem; color: var(--primary-color); height: 40px;
+        }
+        #hero .scroll-down {
+            position: absolute; bottom: 30px; color: white;
+            font-size: 1rem; text-decoration: none;
+        }
+        #hero .scroll-down i { display: block; margin-top: 5px; animation: bounce 2s infinite; }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* --- Estilos Gerais de Seção --- */
+        section { padding: 100px 0; }
+        .section-title {
+            text-align: center; font-family: var(--header-font); font-size: 3.5rem;
+            margin-bottom: 60px; color: white; position: relative;
+        }
+        .section-title::after {
+            content: ''; position: absolute; width: 80px; height: 4px;
+            bottom: -10px; left: 50%; transform: translateX(-50%);
+            background-color: var(--primary-color);
+        }
+
+        /* --- Seção Sobre Mim --- */
+        #about .about-content {
+            display: grid; grid-template-columns: 1fr 2fr; gap: 50px; align-items: center;
+        }
+        #about .profile-pic {
+            width: 250px; height: 250px; border-radius: 50%;
+            border: 5px solid var(--primary-color); object-fit: cover; justify-self: center;
+        }
+        #about p { line-height: 1.8; margin-bottom: 20px; }
+
+        /* --- Seção Tecnologias --- */
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; text-align: center; }
+        .tech-card {
+            background-color: var(--card-background); padding: 20px; border-radius: 10px;
+            border-bottom: 3px solid transparent; transition: all 0.3s ease;
+        }
+        .tech-card:hover { transform: translateY(-10px); border-bottom-color: var(--primary-color); }
+        .tech-card img { width: 50px; height: 50px; margin-bottom: 10px; }
+
+        /* --- Seção Experiência (Timeline) --- */
+        .timeline { position: relative; max-width: 800px; margin: 0 auto; }
+        .timeline::after {
+            content: ''; position: absolute; width: 4px; background-color: var(--card-background);
+            top: 0; bottom: 0; left: 50%; margin-left: -2px;
+        }
+        .timeline-item { padding: 10px 40px; position: relative; width: 50%; }
+        .timeline-item:nth-child(odd) { left: 0; }
+        .timeline-item:nth-child(even) { left: 50%; }
+        .timeline-item::after {
+            content: ''; position: absolute; width: 20px; height: 20px; right: -10px;
+            background-color: var(--background-color); border: 4px solid var(--primary-color);
+            top: 25px; border-radius: 50%; z-index: 1;
+        }
+        .timeline-item:nth-child(even)::after { left: -10px; }
+        .timeline-content { padding: 20px; background-color: var(--card-background); border-radius: 8px; position: relative; }
+        .timeline-content h3 { color: var(--primary-color); }
+        .timeline-content .date { font-style: italic; font-size: 0.9rem; margin-bottom: 10px; display: block; }
+
+
+        /* --- Seção Projetos --- */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .project-card {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .project-links {
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        .project-links a {
+            color: var(--text-color);
+            font-size: 1.6rem;
+            transition: color 0.3s ease;
+        }
+
+        .project-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .project-card h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .project-card p {
+            flex-grow: 1; /* Faz a descrição ocupar o espaço disponível */
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .project-tech span {
+            background-color: rgba(26, 188, 156, 0.1);
+            color: var(--primary-color);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* --- Rodapé --- */
+        footer { background-color: var(--card-background); text-align: center; padding: 40px 20px; }
+        footer .social-links a { color: white; font-size: 1.8rem; margin: 0 15px; transition: color 0.3s ease; }
+        footer .social-links a:hover { color: var(--primary-color); }
+        footer p { margin-top: 20px; font-size: 0.9rem; }
+
+        /* --- Responsividade --- */
+        @media (max-width: 768px) {
+            nav ul { display: none; }
+            #hero h1 { font-size: 3rem; }
+            #about .about-content { grid-template-columns: 1fr; }
+            #about .profile-pic { margin-bottom: 30px; }
+            .timeline::after { left: 20px; }
+            .timeline-item { width: 100%; padding-left: 60px; padding-right: 10px; }
+            .timeline-item:nth-child(even) { left: 0; }
+            .timeline-item::after { left: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="container">
+            <div class="logo">Felipe</div>
+            <ul>
+                <li><a href="#hero" data-key="navHome">Home</a></li>
+                <li><a href="#about" data-key="navAbout">About</a></li>
+                <li><a href="#tech-stack" data-key="navTech">Technologies</a></li>
+                <li><a href="#experience" data-key="navCareer">Career</a></li>
+                <li><a href="#projects" data-key="navProjects">Projects</a></li> 
+                <li><a href="#contact" data-key="navContact">Contact</a></li>
+            </ul>
+            <div class="lang-selector">
+                <button id="lang-en" class="active">EN</button>
+                <button id="lang-pt">PT</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero">
+            <h1 data-aos="fade-down">Felipe Meneguzzi</h1>
+            <p class="subtitle" id="typing-effect"></p>
+            <a href="#about" class="scroll-down">
+                <span data-key="explore">Explore</span>
+                <i class="fas fa-chevron-down"></i>
+            </a>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <h2 class="section-title" data-aos="fade-up" data-key="aboutTitle">ABOUT ME</h2>
+                <div class="about-content">
+                    <img src="https://avatars.githubusercontent.com/u/127371784?v=4" alt="Profile Picture" class="profile-pic" data-aos="zoom-in">
+                    <div data-aos="fade-left">
+                        <p data-key="aboutP1">
+                            Hello! I am a Computer Engineering student at FIAP and a Backend developer passionate about building robust and scalable systems. With experience in <strong>Java, PHP, and Go</strong>, my focus is on creating efficient software architectures, applying concepts like <strong>DDD, Microservices, and RESTful APIs</strong>.
+                        </p>
+                        <p data-key="aboutP2">
+                            I am familiar with <strong>Cloud environments (AWS)</strong>, <strong>CI/CD</strong> practices, and infrastructure management with <strong>Nginx and Docker</strong>. I am a proactive professional, fluent in English, and always seeking new challenges to enhance my skills.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="tech-stack" style="background-color: var(--card-background);">
+            <div class="container">
+                <h2 class="section-title" data-aos="fade-up" data-key="techTitle">TECHNOLOGIES</h2>
+                <div class="tech-grid">
+                    </div>
+            </div>
+        </section>
+        
+        <section id="experience">
+            <div class="container">
+                <h2 class="section-title" data-aos="fade-up" data-key="careerTitle">CAREER & EDUCATION</h2>
+                <div class="timeline">
+                    <div class="timeline-item" data-aos="fade-right">
+                        <div class="timeline-content">
+                            <h3 data-key="job1Title">Backend Engineer & Developer</h3>
+                            <span class="date">2025 - Present @ CGI Software</span>
+                            <p data-key="job1Desc">Responsible for the development and maintenance of high-performance backend systems.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item" data-aos="fade-left">
+                        <div class="timeline-content">
+                            <h3 data-key="job2Title">Java Backend Developer</h3>
+                            <span class="date">2024 - 2025 @ LiquidWorks</span>
+                            <p data-key="job2Desc">Worked on creating APIs and microservices using the Spring ecosystem.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item" data-aos="fade-right">
+                        <div class="timeline-content">
+                            <h3 data-key="edu1Title">Software Engineering</h3>
+                            <span class="date">2025 - Present @ FIAP</span>
+                            <p data-key="edu1Desc">Deepening knowledge in software architecture, engineering, and project management.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item" data-aos="fade-left">
+                        <div class="timeline-content">
+                            <h3 data-key="edu2Title">Computer Engineering</h3>
+                            <span class="date">2022 - 2025 @ UNIVATES</span>
+                            <p data-key="edu2Desc">Solid foundation in hardware, software, networks, and embedded systems.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <div class="container">
+                <h2 class="section-title" data-aos="fade-up" data-key="projectsTitle">PROJECTS</h2>
+                <div class="projects-grid">
+                    
+                    <div class="project-card" data-aos="fade-up">
+                        <div class="project-links">
+                            <a href="https://github.com/Felipe-Meneguzzi/modularphp" target="_blank" aria-label="GitHub Repository">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                        <h3 data-key="proj1Title">ModularPHP</h3>
+                        <p data-key="proj1Desc">
+                            A robust and scalable template for building new APIs in PHP, designed with a modular architecture and good development practices. Includes a Dockerized environment, observability with OpenTelemetry, and JWT authentication.
+                        </p>
+                        <div class="project-tech">
+                            <span>PHP</span>
+                            <span>Docker</span>
+                            <span>MySQL</span>
+                            <span>OpenTelemetry</span>
+                            <span>JWT</span>
+                        </div>
+                    </div>
+        
+                    <div class="project-card" data-aos="fade-up" data-aos-delay="100">
+                         <div class="project-links">
+                            <a href="https://github.com/Felipe-Meneguzzi/CompileActions" target="_blank" aria-label="GitHub Repository">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </div>
+                        <h3 data-key="proj2Title">CompileActions Microservice</h3>
+                        <p data-key="proj2Desc">
+                            A webhook-driven microservice that integrates with GitHub Actions to automate multi-platform builds. It intelligently detects the programming language of modified files and triggers the corresponding compilation and deployment pipelines.
+                        </p>
+                        <div class="project-tech">
+                            <span>Java</span>
+                            <span>Spring Boot</span>
+                            <span>PostgreSQL</span>
+                            <span>Docker</span>
+                            <span>Git Actions</span>
+                        </div>
+                    </div>
+        
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer id="contact">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up" data-key="contactTitle">CONTACT</h2>
+            <p data-aos="fade-up" data-aos-delay="100" data-key="contactSubtitle">
+                Let's build something amazing together? Get in touch!
+            </p>
+            <div class="social-links" data-aos="fade-up" data-aos-delay="200">
+                <a href="mailto:felipe.meneguzzi@universo.univates.br" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                <a href="https://github.com/Felipe-Meneguzzi" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/felipe-meneguzzi-programador" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <p data-key="footerRights">&copy; 2025 Felipe Meneguzzi. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+
+    <script>
+        // AOS Animation Library Init
+        AOS.init({
+            duration: 800,
+            once: true,
+        });
+
+        // --- Translation Logic ---
+        const translations = {
+            pt: {
+                navHome: 'Início',
+                navAbout: 'Sobre',
+                navTech: 'Tecnologias',
+                navCareer: 'Carreira',
+                navContact: 'Contato',
+                navProjects: 'Projetos',
+                typingEffect: ['Desenvolvedor Backend', 'Engenheiro de Software', 'Java | PHP | Go'],
+                explore: 'Explore',
+                aboutTitle: 'SOBRE MIM',
+                aboutP1: 'Olá! Sou estudante de Engenharia de Computação na FIAP e um desenvolvedor Backend apaixonado por construir sistemas robustos e escaláveis. Com experiência em <strong>Java, PHP e Go</strong>, meu foco é criar arquiteturas de software eficientes, aplicando conceitos como <strong>DDD, Microsserviços e APIs RESTful</strong>.',
+                aboutP2: 'Tenho familiaridade com ambientes <strong>Cloud (AWS)</strong>, práticas de <strong>CI/CD</strong> e gerenciamento de infraestrutura com <strong>Nginx e Docker</strong>. Sou um profissional proativo, fluente em inglês e sempre em busca de novos desafios para aprimorar minhas habilidades.',
+                techTitle: 'TECNOLOGIAS',
+                careerTitle: 'CARREIRA & EDUCAÇÃO',
+                job1Title: 'Engenheiro e Desenvolvedor Backend',
+                job1Desc: 'Responsável pelo desenvolvimento e manutenção de sistemas backend de alta performance.',
+                job2Title: 'Desenvolvedor Backend Java',
+                job2Desc: 'Atuei na criação de APIs e microsserviços utilizando o ecossistema Spring.',
+                edu1Title: 'Engenharia de Software',
+                edu1Desc: 'Aprofundando conhecimentos em arquitetura de software, engenharia e gestão de projetos.',
+                edu2Title: 'Engenharia da Computação',
+                edu2Desc: 'Base sólida em hardware, software, redes e sistemas embarcados.',
+                projectsTitle: 'PROJETOS',
+                proj1Title: 'ModularPHP',
+                proj1Desc: 'Um template robusto e escalável para a construção de novas APIs em PHP, projetado com uma arquitetura modular e boas práticas de desenvolvimento. Inclui ambiente Dockerizado, observabilidade com OpenTelemetry e autenticação JWT.',
+                proj2Title: 'Microsserviço CompileActions',
+                proj2Desc: 'Um microsserviço orientado por webhooks que se integra ao GitHub Actions para automatizar compilações multiplataforma. Ele detecta inteligentemente a linguagem de programação dos arquivos modificados e aciona os pipelines de compilação e implantação correspondentes.',
+                contactTitle: 'CONTATO',
+                contactSubtitle: 'Vamos construir algo incrível juntos? Entre em contato!',
+                footerRights: '&copy; 2025 Felipe Meneguzzi. Todos os direitos reservados.',
+            },
+            en: {
+                navHome: 'Home',
+                navAbout: 'About',
+                navTech: 'Technologies',
+                navCareer: 'Career',
+                navProjects: 'Projects',
+                navContact: 'Contact',
+                typingEffect: ['Backend Developer', 'Software Engineer', 'Java | PHP | Go'],
+                explore: 'Explore',
+                aboutTitle: 'ABOUT ME',
+                aboutP1: 'Hello! I am a Computer Engineering student at FIAP and a Backend developer passionate about building robust and scalable systems. With experience in <strong>Java, PHP, and Go</strong>, my focus is on creating efficient software architectures, applying concepts like <strong>DDD, Microservices, and RESTful APIs</strong>.',
+                aboutP2: 'I am familiar with <strong>Cloud environments (AWS)</strong>, <strong>CI/CD</strong> practices, and infrastructure management with <strong>Nginx and Docker</strong>. I am a proactive professional, fluent in English, and always seeking new challenges to enhance my skills.',
+                techTitle: 'TECHNOLOGIES',
+                careerTitle: 'CAREER & EDUCATION',
+                job1Title: 'Backend Engineer & Developer',
+                job1Desc: 'Responsible for the development and maintenance of high-performance backend systems.',
+                job2Title: 'Java Backend Developer',
+                job2Desc: 'Worked on creating APIs and microservices using the Spring ecosystem.',
+                edu1Title: 'Software Engineering',
+                edu1Desc: 'Deepening knowledge in software architecture, engineering, and project management.',
+                edu2Title: 'Computer Engineering',
+                edu2Desc: 'Solid foundation in hardware, software, networks, and embedded systems.',
+                projectsTitle: 'PROJECTS',
+                proj1Title: 'ModularPHP',
+                proj1Desc: 'A robust and scalable template for building new APIs in PHP, designed with a modular architecture and good development practices. Includes a Dockerized environment, observability with OpenTelemetry, and JWT authentication.',
+                proj2Title: 'CompileActions Microservice',
+                proj2Desc: 'A webhook-driven microservice that integrates with GitHub Actions to automate multi-platform builds. It intelligently detects the programming language of modified files and triggers the corresponding compilation and deployment pipelines.',
+                contactTitle: 'CONTACT',
+                contactSubtitle: 'Let\'s build something amazing together? Get in touch!',
+                footerRights: '&copy; 2025 Felipe Meneguzzi. All rights reserved.',
+            }
+        };
+
+        const langPtBtn = document.getElementById('lang-pt');
+        const langEnBtn = document.getElementById('lang-en');
+        let typedInstance = null;
+
+        const changeLanguage = (lang) => {
+            document.documentElement.lang = lang;
+            const langData = translations[lang];
+
+            document.querySelectorAll('[data-key]').forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (langData[key]) {
+                    element.innerHTML = langData[key];
+                }
+            });
+
+            if (typedInstance) {
+                typedInstance.destroy();
+            }
+            typedInstance = new Typed('#typing-effect', {
+                strings: langData.typingEffect,
+                typeSpeed: 70,
+                backSpeed: 50,
+                loop: true,
+                smartBackspace: true,
+            });
+
+            if (lang === 'pt') {
+                langPtBtn.classList.add('active');
+                langEnBtn.classList.remove('active');
+            } else {
+                langEnBtn.classList.add('active');
+                langPtBtn.classList.remove('active');
+            }
+        };
+
+        langPtBtn.addEventListener('click', () => changeLanguage('pt'));
+        langEnBtn.addEventListener('click', () => changeLanguage('en'));
+
+        // Set initial language to English
+        changeLanguage('en');
+
+        // --- Original Technologies Logic (unchanged) ---
+        const technologies = [
+            { name: 'Java', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg' },
+            { name: 'Spring', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg' },
+            { name: 'Gradle', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/gradle/gradle-original.svg' },
+            { name: 'Maven', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/maven/maven-original.svg' },
+            { name: 'PHP', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg' },
+            { name: 'Laravel', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/laravel/laravel-original.svg' },
+            { name: 'Composer', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/composer/composer-original.svg' },
+            { name: 'Apache', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/apache/apache-original.svg' },
+            { name: 'Go', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg' },
+            { name: 'MySQL', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg' },
+            { name: 'PostgreSQL', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg' },
+            { name: 'Redis', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg' },
+            { name: 'Git', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg' },
+            { name: 'GitActions', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/githubactions/githubactions-original.svg' },
+            { name: 'GitHub', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg' },
+            { name: 'GitLab', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/gitlab/gitlab-original.svg' },
+            { name: 'Docker', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg' },
+            { name: 'Kubernetes', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-original.svg' },
+            { name: 'AWS', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg' },
+            { name: 'Nginx', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg' },
+            { name: 'Linux', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg' },
+            { name: 'FileZilla', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/filezilla/filezilla-original.svg' },
+            { name: 'Cloudflare', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cloudflare/cloudflare-original.svg' },
+            { name: 'Dbeaver', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/dbeaver/dbeaver-original.svg' },
+            { name: 'Postman', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postman/postman-original.svg' },
+            { name: 'Insomnia', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/insomnia/insomnia-original.svg' },
+            { name: 'OpenTelemetry', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opentelemetry/opentelemetry-original.svg' },
+        ];
+        
+        const techGrid = document.querySelector('.tech-grid');
+        technologies.forEach((tech, index) => {
+            const delay = index * 50;
+            const card = document.createElement('div');
+            card.className = 'tech-card';
+            card.setAttribute('data-aos', 'fade-up');
+            card.setAttribute('data-aos-delay', delay);
+            card.innerHTML = `<img src="${tech.icon}" alt="${tech.name}"><p>${tech.name}</p>`;
+            techGrid.appendChild(card);
+        });
+    </script>
+</body>
+</html>
