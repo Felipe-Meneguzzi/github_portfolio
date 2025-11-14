@@ -34,10 +34,6 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html { 
-            /* scroll-behavior: smooth; <- Removed, Lenis handles this */
-        }
-
         body {
             font-family: var(--body-font);
             background-color: var(--background-color);
@@ -330,9 +326,6 @@
             opacity: 0;
             transition: opacity 0.3s ease, transform 0.1s linear;
             animation: rotate 10s linear infinite paused;
-        }
-        .project-card:hover {
-            /* Handled by JS 3D tilt */
         }
         .project-card:hover::before {
             opacity: 0.3;
