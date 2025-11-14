@@ -5,46 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Felipe Meneguzzi — Backend Developer & Engineer</title>
     
+    <!-- Libs -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <style>
-        /* CSS Reset & Fontes */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Teko:wght@400;700&display=swap');
+        /* --- CSS Reset & Font Imports --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Teko:wght@400;700&display=swap');
 
         :root {
             --primary-color: #1ABC9C;
-            --secondary-color: #2c3e50;
-            --background-color: #0f172a; /* Azul bem escuro */
-            --card-background: #1e293b; /* Azul ardósia */
-            --text-color: #cbd5e1; /* Cinza claro */
+            --background-color: #0a101f; /* Slightly darker than before */
+            --card-background: #1e293b;
+            --text-color: #cbd5e1;
             --header-font: 'Teko', sans-serif;
-            --body-font: 'Roboto', sans-serif;
+            --body-font: 'Inter', sans-serif; /* Modern Font */
             --border-color: rgba(26, 188, 156, 0.2);
+            --glow-color: rgba(26, 188, 156, 0.15);
+            --angle: 0deg; /* For animated border */
+        }
+
+        /* For animated border */
+        @property --angle {
+          syntax: '<angle>';
+          initial-value: 0deg;
+          inherits: false;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
+
+        html { 
+            /* scroll-behavior: smooth; <- Removed, Lenis handles this */
+        }
+
         body {
             font-family: var(--body-font);
             background-color: var(--background-color);
             color: var(--text-color);
             overflow-x: hidden;
+            /* Mouse-follow spotlight effect */
+            background-image: radial-gradient(
+                800px circle at var(--mouse-x, -1000px) var(--mouse-y, -1000px), 
+                var(--glow-color), 
+                transparent 40%
+            );
+            background-attachment: fixed;
         }
+
         .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
         /* --- Cabeçalho e Navegação --- */
         header {
             width: 100%; padding: 1rem 0; position: fixed;
-            top: 0; z-index: 1000; background-color: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px); transition: top 0.3s;
+            top: 0; z-index: 1000; 
+            background-color: rgba(10, 16, 31, 0.7); /* Match new bg */
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         nav { display: flex; justify-content: space-between; align-items: center; }
         nav .logo {
             font-family: var(--header-font); font-size: 2.5rem;
             color: var(--primary-color); text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        nav ul { list-style: none; display: flex; }
+        nav ul { list-style: none; display: flex; align-items: center; }
         nav ul li a {
             color: white; text-decoration: none; margin: 0 15px;
             font-weight: bold; position: relative; padding: 5px 0;
@@ -59,6 +83,7 @@
         nav ul li a:hover::after { width: 100%; }
 
         /* --- Seletor de Idioma --- */
+        .lang-selector { margin-left: 15px; }
         .lang-selector button {
             background: none; border: 1px solid var(--primary-color);
             color: var(--primary-color); padding: 5px 10px;
@@ -70,23 +95,58 @@
             color: var(--background-color);
         }
 
+        /* --- Mobile Menu --- */
+        #menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 1002;
+        }
+
         /* --- Seção Hero --- */
         #hero {
             height: 100vh; display: flex; align-items: center;
             justify-content: center; text-align: center; flex-direction: column;
+            position: relative; /* For canvas */
+            overflow: hidden;
         }
+
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.7;
+        }
+        
+        #hero .hero-content {
+            position: relative;
+            z-index: 2; /* Content on top of canvas */
+            background: rgba(10, 16, 31, 0.2);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+
         #hero h1 {
             font-family: var(--header-font); font-size: 5rem;
             color: white; margin: 0;
+            text-shadow: 0 0 20px rgba(26, 188, 156, 0.5);
         }
         #hero .subtitle {
             font-size: 1.5rem; color: var(--primary-color); height: 40px;
         }
         #hero .scroll-down {
             position: absolute; bottom: 30px; color: white;
-            font-size: 1rem; text-decoration: none;
+            font-size: 1rem; text-decoration: none; z-index: 2;
         }
         #hero .scroll-down i { display: block; margin-top: 5px; animation: bounce 2s infinite; }
+        
         @keyframes bounce {
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
             40% { transform: translateY(-10px); }
@@ -94,15 +154,19 @@
         }
 
         /* --- Estilos Gerais de Seção --- */
-        section { padding: 100px 0; }
+        section { padding: 100px 0; position: relative; }
         .section-title {
             text-align: center; font-family: var(--header-font); font-size: 3.5rem;
             margin-bottom: 60px; color: white; position: relative;
+            letter-spacing: 1px;
+            /* Parallax will be applied via JS */
+            transition: transform 0.1s linear;
         }
         .section-title::after {
             content: ''; position: absolute; width: 80px; height: 4px;
             bottom: -10px; left: 50%; transform: translateX(-50%);
             background-color: var(--primary-color);
+            border-radius: 2px;
         }
 
         /* --- Seção Sobre Mim --- */
@@ -112,42 +176,120 @@
         #about .profile-pic {
             width: 250px; height: 250px; border-radius: 50%;
             border: 5px solid var(--primary-color); object-fit: cover; justify-self: center;
+            box-shadow: 0 0 30px var(--glow-color);
         }
         #about p { line-height: 1.8; margin-bottom: 20px; }
+        #about p strong { color: var(--primary-color); font-weight: 700; }
 
         /* --- Seção Tecnologias --- */
-        .tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; text-align: center; }
-        .tech-card {
+        #tech-stack {
             background-color: var(--card-background);
+            position: relative;
+            z-index: 5; /* Ensure cards are above bg elements */
+        }
+        .tech-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+            gap: 20px; 
+            text-align: center; 
+        }
+
+        .tech-card {
+            background-color: var(--background-color); /* Darker than section */
             padding: 20px;
             border-radius: 10px;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
+            
+            /* 3D Tilt Effect */
+            transition: transform 0.1s linear;
+            transform-style: preserve-3d;
+            
+            /* Animated Glow Border */
+            position: relative;
+            z-index: 1;
         }
-        .tech-card:hover { transform: translateY(-10px); border-bottom-color: var(--primary-color); }
-        .tech-card img { width: 50px; height: 50px; margin-bottom: 10px; }
+
+        .tech-card::before {
+            content: "";
+            position: absolute;
+            inset: -2px; /* Border thickness */
+            background: conic-gradient(from var(--angle), 
+                var(--background-color), 
+                var(--primary-color) 20%, 
+                var(--primary-color) 40%, 
+                var(--background-color) 60%);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            animation: rotate 8s linear infinite paused;
+        }
+
+        .tech-card:hover {
+            transform: scale(1.05); /* Simpler hover for tech cards */
+        }
+        .tech-card:hover::before {
+            opacity: 0.3;
+            animation-play-state: running;
+        }
+        
+        @keyframes rotate {
+          to { --angle: 360deg; }
+        }
+
+        .tech-card img { 
+            width: 50px; height: 50px; margin-bottom: 10px; 
+            object-fit: contain; /* Better for non-square icons */
+        }
+        .tech-card p {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
 
         /* --- Seção Experiência (Timeline) --- */
         .timeline { position: relative; max-width: 800px; margin: 0 auto; }
         .timeline::after {
-            content: ''; position: absolute; width: 4px; background-color: var(--card-background);
+            content: ''; position: absolute; width: 4px; 
+            /* Gradient for the line */
+            background: linear-gradient(to bottom, transparent, var(--primary-color), transparent);
             top: 0; bottom: 0; left: 50%; margin-left: -2px;
+            opacity: 0.5;
         }
         .timeline-item { padding: 10px 40px; position: relative; width: 50%; }
         .timeline-item:nth-child(odd) { left: 0; }
         .timeline-item:nth-child(even) { left: 50%; }
+        
         .timeline-item::after {
             content: ''; position: absolute; width: 20px; height: 20px; right: -10px;
-            background-color: var(--background-color); border: 4px solid var(--primary-color);
+            background-color: var(--background-color); 
+            border: 4px solid var(--primary-color);
             top: 25px; border-radius: 50%; z-index: 1;
+            /* Glow effect */
+            box-shadow: 0 0 15px var(--primary-color);
+            transition: transform 0.3s ease;
         }
+        .timeline-item:hover::after {
+            transform: scale(1.2);
+        }
+
         .timeline-item:nth-child(even)::after { left: -10px; }
-        .timeline-content { padding: 20px; background-color: var(--card-background); border-radius: 8px; position: relative; }
+        .timeline-content { 
+            padding: 20px; 
+            background-color: var(--card-background); 
+            border-radius: 8px; 
+            position: relative; 
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .timeline-item:hover .timeline-content {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
         .timeline-content h3 { color: var(--primary-color); }
-        .timeline-content .date { font-style: italic; font-size: 0.9rem; margin-bottom: 10px; display: block; }
+        .timeline-content .date { font-style: italic; font-size: 0.9rem; margin-bottom: 10px; display: block; opacity: 0.8; }
 
 
         /* --- Seção Projetos --- */
@@ -164,46 +306,57 @@
             border-radius: 10px;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            
+            /* 3D Tilt Effect */
+            transform-style: preserve-3d;
+            transition: transform 0.1s linear;
+
+            /* Animated Glow Border */
+            position: relative;
+            z-index: 1;
         }
 
+        /* Re-using the same glow border effect */
+        .project-card::before {
+            content: "";
+            position: absolute;
+            inset: -2px; /* Border thickness */
+            background: conic-gradient(from var(--angle), 
+                var(--card-background), 
+                var(--primary-color) 30%, 
+                var(--card-background) 70%);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.1s linear;
+            animation: rotate 10s linear infinite paused;
+        }
         .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            /* Handled by JS 3D tilt */
+        }
+        .project-card:hover::before {
+            opacity: 0.3;
+            animation-play-state: running;
         }
 
         .project-links {
             text-align: right;
             margin-bottom: 15px;
         }
-
         .project-links a {
             color: var(--text-color);
             font-size: 1.6rem;
             transition: color 0.3s ease;
         }
-
-        .project-links a:hover {
-            color: var(--primary-color);
-        }
-
-        .project-card h3 {
-            color: white;
-            margin-bottom: 10px;
-        }
-
+        .project-links a:hover { color: var(--primary-color); }
+        .project-card h3 { color: white; margin-bottom: 10px; }
         .project-card p {
-            flex-grow: 1; /* Faz a descrição ocupar o espaço disponível */
+            flex-grow: 1;
             line-height: 1.7;
             margin-bottom: 20px;
+            opacity: 0.9;
         }
-
-        .project-tech {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
+        .project-tech { display: flex; flex-wrap: wrap; gap: 10px; }
         .project-tech span {
             background-color: rgba(26, 188, 156, 0.1);
             color: var(--primary-color);
@@ -214,17 +367,59 @@
         }
 
         /* --- Rodapé --- */
-        footer { background-color: var(--card-background); text-align: center; padding: 40px 20px; }
-        footer .social-links a { color: white; font-size: 1.8rem; margin: 0 15px; transition: color 0.3s ease; }
-        footer .social-links a:hover { color: var(--primary-color); }
-        footer p { margin-top: 20px; font-size: 0.9rem; }
+        footer { 
+            background-color: var(--card-background); 
+            text-align: center; 
+            padding: 40px 20px; 
+            border-top: 1px solid var(--border-color);
+        }
+        footer .social-links a { color: white; font-size: 1.8rem; margin: 0 15px; transition: color 0.3s ease, transform 0.3s ease; }
+        footer .social-links a:hover { color: var(--primary-color); transform: translateY(-5px); }
+        footer p { margin-top: 20px; font-size: 0.9rem; opacity: 0.8; }
 
         /* --- Responsividade --- */
         @media (max-width: 768px) {
-            nav ul { display: none; }
+            nav ul { 
+                /* Mobile Menu Styles */
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                position: fixed;
+                top: 0;
+                left: -100%; /* Start off-screen */
+                width: 100%;
+                height: 100vh;
+                background-color: rgba(10, 16, 31, 0.95);
+                backdrop-filter: blur(10px);
+                transition: left 0.3s ease-in-out;
+                z-index: 1001;
+            }
+            nav ul.active {
+                left: 0;
+            }
+            nav ul li {
+                margin: 1.5rem 0;
+            }
+            nav ul li a {
+                font-size: 1.5rem;
+            }
+            .lang-selector {
+                margin-left: 0;
+                margin-top: 1rem;
+            }
+
+            #menu-toggle {
+                display: block;
+            }
+
             #hero h1 { font-size: 3rem; }
+            #hero .hero-content { padding: 1rem; }
+
             #about .about-content { grid-template-columns: 1fr; }
-            #about .profile-pic { margin-bottom: 30px; }
+            #about .profile-pic { margin-bottom: 30px; width: 200px; height: 200px; }
+            
+            /* Center timeline on mobile */
             .timeline::after { left: 20px; }
             .timeline-item { width: 100%; padding-left: 60px; padding-right: 10px; }
             .timeline-item:nth-child(even) { left: 0; }
@@ -237,31 +432,43 @@
     <header>
         <nav class="container">
             <div class="logo">Felipe</div>
-            <ul>
-                <li><a href="#hero" data-key="navHome">Home</a></li>
-                <li><a href="#about" data-key="navAbout">About</a></li>
-                <li><a href="#tech-stack" data-key="navTech">Technologies</a></li>
-                <li><a href="#experience" data-key="navCareer">Career</a></li>
-                <li><a href="#projects" data-key="navProjects">Projects</a></li> 
-                <li><a href="#contact" data-key="navContact">Contact</a></li>
-            </ul>
-            <div class="lang-selector">
-                <button id="lang-en" class="active">EN</button>
-                <button id="lang-pt">PT</button>
+            <div class="nav-right">
+                <ul id="nav-menu">
+                    <li><a href="#hero" data-key="navHome">Home</a></li>
+                    <li><a href="#about" data-key="navAbout">About</a></li>
+                    <li><a href="#tech-stack" data-key="navTech">Technologies</a></li>
+                    <li><a href="#experience" data-key="navCareer">Career</a></li>
+                    <li><a href="#projects" data-key="navProjects">Projects</a></li> 
+                    <li><a href="#contact" data-key="navContact">Contact</a></li>
+                    <li>
+                        <div class="lang-selector">
+                            <button id="lang-en" class="active">EN</button>
+                            <button id="lang-pt">PT</button>
+                        </div>
+                    </li>
+                </ul>
             </div>
+             <button id="menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
         </nav>
     </header>
 
     <main>
+        <!-- Hero Section with 3D Background -->
         <section id="hero">
-            <h1 data-aos="fade-down">Felipe Meneguzzi</h1>
-            <p class="subtitle" id="typing-effect"></p>
+            <canvas id="bg-canvas"></canvas>
+            <div class="hero-content" data-aos="fade-in">
+                <h1 data-aos="fade-down">Felipe Meneguzzi</h1>
+                <p class="subtitle" id="typing-effect"></p>
+            </div>
             <a href="#about" class="scroll-down">
                 <span data-key="explore">Explore</span>
                 <i class="fas fa-chevron-down"></i>
             </a>
         </section>
 
+        <!-- About Section -->
         <section id="about">
             <div class="container">
                 <h2 class="section-title" data-aos="fade-up" data-key="aboutTitle">ABOUT ME</h2>
@@ -279,18 +486,22 @@
             </div>
         </section>
         
+        <!-- Tech Stack Section -->
         <section id="tech-stack" style="background-color: var(--card-background);">
             <div class="container">
                 <h2 class="section-title" data-aos="fade-up" data-key="techTitle">TECHNOLOGIES</h2>
                 <div class="tech-grid">
-                    </div>
+                    <!-- Tech cards will be dynamically inserted here by JS -->
+                </div>
             </div>
         </section>
         
+        <!-- Experience Section -->
         <section id="experience">
             <div class="container">
                 <h2 class="section-title" data-aos="fade-up" data-key="careerTitle">CAREER & EDUCATION</h2>
                 <div class="timeline">
+                    <!-- Item 1 -->
                     <div class="timeline-item" data-aos="fade-right">
                         <div class="timeline-content">
                             <h3 data-key="job1Title">Backend Engineer & Developer</h3>
@@ -298,6 +509,7 @@
                             <p data-key="job1Desc">Responsible for the development and maintenance of high-performance backend systems.</p>
                         </div>
                     </div>
+                    <!-- Item 2 -->
                     <div class="timeline-item" data-aos="fade-left">
                         <div class="timeline-content">
                             <h3 data-key="job2Title">Java Backend Developer</h3>
@@ -305,6 +517,7 @@
                             <p data-key="job2Desc">Worked on creating APIs and microservices using the Spring ecosystem.</p>
                         </div>
                     </div>
+                    <!-- Item 3 -->
                     <div class="timeline-item" data-aos="fade-right">
                         <div class="timeline-content">
                             <h3 data-key="edu1Title">Software Engineering</h3>
@@ -312,6 +525,7 @@
                             <p data-key="edu1Desc">Deepening knowledge in software architecture, engineering, and project management.</p>
                         </div>
                     </div>
+                    <!-- Item 4 -->
                     <div class="timeline-item" data-aos="fade-left">
                         <div class="timeline-content">
                             <h3 data-key="edu2Title">Computer Engineering</h3>
@@ -323,11 +537,13 @@
             </div>
         </section>
 
+        <!-- Projects Section -->
         <section id="projects">
             <div class="container">
                 <h2 class="section-title" data-aos="fade-up" data-key="projectsTitle">PROJECTS</h2>
                 <div class="projects-grid">
                     
+                    <!-- Project 1 -->
                     <div class="project-card" data-aos="fade-up">
                         <div class="project-links">
                             <a href="https://github.com/Felipe-Meneguzzi/modularphp" target="_blank" aria-label="GitHub Repository">
@@ -347,6 +563,7 @@
                         </div>
                     </div>
         
+                    <!-- Project 2 -->
                     <div class="project-card" data-aos="fade-up" data-aos-delay="100">
                          <div class="project-links">
                             <a href="https://github.com/Felipe-Meneguzzi/CompileActions" target="_blank" aria-label="GitHub Repository">
@@ -371,6 +588,7 @@
         </section>
     </main>
     
+    <!-- Footer -->
     <footer id="contact">
         <div class="container">
             <h2 class="section-title" data-aos="fade-up" data-key="contactTitle">CONTACT</h2>
@@ -386,162 +604,313 @@
         </div>
     </footer>
 
+    <!-- JavaScript Libraries -->
+    <!-- 3D Model Lib -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Smooth Scroll Lib -->
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <!-- Animation on Scroll Lib -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Typing Effect Lib -->
     <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
 
     <script>
-        // AOS Animation Library Init
-        AOS.init({
-            duration: 800,
-            once: true,
-        });
+        document.addEventListener('DOMContentLoaded', () => {
 
-        // --- Translation Logic ---
-        const translations = {
-            pt: {
-                navHome: 'Início',
-                navAbout: 'Sobre',
-                navTech: 'Tecnologias',
-                navCareer: 'Carreira',
-                navContact: 'Contato',
-                navProjects: 'Projetos',
-                typingEffect: ['Desenvolvedor & Engenheiro de Backend', 'Engenheiro de Software', 'Java | PHP | Go | Progress ABL'],
-                explore: 'Explore',
-                aboutTitle: 'SOBRE MIM',
-                aboutP1: 'Olá! Sou estudante de Engenharia de Computação na FIAP e um desenvolvedor Backend apaixonado por construir sistemas robustos e escaláveis. Com experiência em <strong>Java, PHP e Go</strong>, meu foco é criar arquiteturas de software eficientes, aplicando conceitos como <strong>DDD, Microsserviços e APIs RESTful</strong>.',
-                aboutP2: 'Tenho familiaridade com ambientes <strong>Cloud (AWS)</strong>, práticas de <strong>CI/CD</strong> e gerenciamento de infraestrutura com <strong>Nginx e Docker</strong>. Sou um profissional proativo, fluente em inglês e sempre em busca de novos desafios para aprimorar minhas habilidades.',
-                techTitle: 'TECNOLOGIAS',
-                careerTitle: 'CARREIRA & EDUCAÇÃO',
-                job1Title: 'Engenheiro e Desenvolvedor Backend',
-                job1Desc: 'Responsável pelo desenvolvimento e manutenção de sistemas backend de alta performance.',
-                job2Title: 'Desenvolvedor Backend Java',
-                job2Desc: 'Atuei na criação de APIs e microsserviços utilizando o ecossistema Spring.',
-                edu1Title: 'Engenharia de Software',
-                edu1Desc: 'Aprofundando conhecimentos em arquitetura de software, engenharia e gestão de projetos.',
-                edu2Title: 'Engenharia da Computação',
-                edu2Desc: 'Base sólida em hardware, software, redes e sistemas embarcados.',
-                projectsTitle: 'PROJETOS',
-                proj1Title: 'ModularPHP',
-                proj1Desc: 'Um template robusto e escalável para a construção de novas APIs em PHP, projetado com uma arquitetura modular e boas práticas de desenvolvimento. Inclui ambiente Dockerizado, observabilidade com OpenTelemetry e autenticação JWT.',
-                proj2Title: 'Microsserviço CompileActions',
-                proj2Desc: 'Um microsserviço orientado por webhooks que se integra ao GitHub Actions para automatizar compilações multiplataforma. Ele detecta inteligentemente a linguagem de programação dos arquivos modificados e aciona os pipelines de compilação e implantação correspondentes.',
-                contactTitle: 'CONTATO',
-                contactSubtitle: 'Vamos construir algo incrível juntos? Entre em contato!',
-                footerRights: '&copy; 2025 Felipe Meneguzzi. Todos os direitos reservados.',
-            },
-            en: {
-                navHome: 'Home',
-                navAbout: 'About',
-                navTech: 'Technologies',
-                navCareer: 'Career',
-                navProjects: 'Projects',
-                navContact: 'Contact',
-                typingEffect: ['Backend Developer & Engineer', 'Software Engineer', 'Java | PHP | Go | Progress ABL'],
-                explore: 'Explore',
-                aboutTitle: 'ABOUT ME',
-                aboutP1: 'Hello! I am a Computer Engineering student at FIAP and a Backend developer passionate about building robust and scalable systems. With experience in <strong>Java, PHP, and Go</strong>, my focus is on creating efficient software architectures, applying concepts like <strong>DDD, Microservices, and RESTful APIs</strong>.',
-                aboutP2: 'I am familiar with <strong>Cloud environments (AWS)</strong>, <strong>CI/CD</strong> practices, and infrastructure management with <strong>Nginx and Docker</strong>. I am a proactive professional, fluent in English, and always seeking new challenges to enhance my skills.',
-                techTitle: 'TECHNOLOGIES',
-                careerTitle: 'CAREER & EDUCATION',
-                job1Title: 'Backend Engineer & Developer',
-                job1Desc: 'Responsible for the development and maintenance of high-performance backend systems.',
-                job2Title: 'Java Backend Developer',
-                job2Desc: 'Worked on creating APIs and microservices using the Spring ecosystem.',
-                edu1Title: 'Software Engineering',
-                edu1Desc: 'Deepening knowledge in software architecture, engineering, and project management.',
-                edu2Title: 'Computer Engineering',
-                edu2Desc: 'Solid foundation in hardware, software, networks, and embedded systems.',
-                projectsTitle: 'PROJECTS',
-                proj1Title: 'ModularPHP',
-                proj1Desc: 'A robust and scalable template for building new APIs in PHP, designed with a modular architecture and good development practices. Includes a Dockerized environment, observability with OpenTelemetry, and JWT authentication.',
-                proj2Title: 'CompileActions Microservice',
-                proj2Desc: 'A webhook-driven microservice that integrates with GitHub Actions to automate multi-platform builds. It intelligently detects the programming language of modified files and triggers the corresponding compilation and deployment pipelines.',
-                contactTitle: 'CONTACT',
-                contactSubtitle: 'Let\'s build something amazing together? Get in touch!',
-                footerRights: '&copy; 2025 Felipe Meneguzzi. All rights reserved.',
-            }
-        };
+            // --- 1. AOS Animation Library Init ---
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 50, // Trigger animations a bit sooner
+            });
 
-        const langPtBtn = document.getElementById('lang-pt');
-        const langEnBtn = document.getElementById('lang-en');
-        let typedInstance = null;
+            // --- 2. Lenis Smooth Scrolling ---
+            const lenis = new Lenis({
+                lerp: 0.07, // Adjust for more/less smoothness
+                smoothWheel: true,
+            });
 
-        const changeLanguage = (lang) => {
-            document.documentElement.lang = lang;
-            const langData = translations[lang];
+            // Parallax on section titles
+            lenis.on('scroll', (e) => {
+                document.querySelectorAll('.section-title[data-aos]').forEach(title => {
+                    // Check if AOS has animated the element
+                    if (title.classList.contains('aos-animate')) {
+                        const speed = -0.1; // Parallax speed
+                        const scrollY = e.animatedScroll;
+                        // Get element's original top position relative to document
+                        const elemTop = title.getBoundingClientRect().top + e.animatedScroll - parseFloat(title.style.transform.replace(/[^0-9.-]/g, '')) || title.offsetTop;
+                        const offset = (scrollY - elemTop) * speed;
+                        
+                        // Apply transform
+                        title.style.transform = `translateY(${offset}px)`;
+                    }
+                });
+            });
 
-            document.querySelectorAll('[data-key]').forEach(element => {
-                const key = element.getAttribute('data-key');
-                if (langData[key]) {
-                    element.innerHTML = langData[key];
+            // --- 3. Three.js Hero Background ---
+            let scene, camera, renderer, model, light;
+            const canvas = document.getElementById('bg-canvas');
+            
+            function initThree() {
+                try {
+                    scene = new THREE.Scene();
+                    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                    camera.position.z = 4;
+
+                    renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+
+                    // Lights
+                    scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+                    light = new THREE.PointLight(0x1ABC9C, 2, 100);
+                    light.position.set(0, 3, 3);
+                    scene.add(light);
+                    
+                    const light2 = new THREE.PointLight(0xffffff, 1, 100);
+                    light2.position.set(0, -3, -3);
+                    scene.add(light2);
+
+
+                    // 3D Model
+                    const geometry = new THREE.TorusKnotGeometry(1.2, 0.25, 120, 16);
+                    const material = new THREE.MeshStandardMaterial({
+                        color: 0x1ABC9C,
+                        metalness: 0.9,
+                        roughness: 0.2
+                    });
+                    model = new THREE.Mesh(geometry, material);
+                    model.position.y = 0.5; // Center it a bit
+                    scene.add(model);
+
+                    window.addEventListener('resize', onWindowResize, false);
+                } catch (e) {
+                    console.error("Three.js initialization failed:", e);
+                    canvas.style.display = 'none'; // Hide canvas if WebGL fails
                 }
+            }
+
+            function onWindowResize() {
+                if(camera && renderer) {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                }
+            }
+            
+            // Animation Loop (Drives Lenis + Three.js)
+            function raf(time) {
+                lenis.raf(time); // Update Lenis
+
+                if (model && renderer) {
+                    model.rotation.x += 0.001;
+                    model.rotation.y += 0.002;
+                    renderer.render(scene, camera);
+                }
+                
+                requestAnimationFrame(raf);
+            }
+            
+            // Start loops
+            initThree();
+            requestAnimationFrame(raf);
+
+
+            // --- 4. Mouse-Follow Spotlight ---
+            window.addEventListener('mousemove', (e) => {
+                // We add scrollY to fix the position when scrolled
+                document.body.style.setProperty('--mouse-y', `${e.clientY + window.scrollY}px`);
+                document.body.style.setProperty('--mouse-x', `${e.clientX}px`);
+            });
+            
+            // --- 5. Interactive 3D Card Tilt ---
+            document.querySelectorAll('.project-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left - (rect.width / 2);
+                    const y = e.clientY - rect.top - (rect.height / 2);
+
+                    const rotateX = (y / rect.height) * -8; // Max 8deg tilt
+                    const rotateY = (x / rect.width) * 8;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+                });
             });
 
-            if (typedInstance) {
-                typedInstance.destroy();
-            }
-            typedInstance = new Typed('#typing-effect', {
-                strings: langData.typingEffect,
-                typeSpeed: 70,
-                backSpeed: 50,
-                loop: true,
-                smartBackspace: true,
+            // --- 6. Mobile Menu Toggle ---
+            const menuToggle = document.getElementById('menu-toggle');
+            const navMenu = document.getElementById('nav-menu');
+
+            menuToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                const icon = menuToggle.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
             });
 
-            if (lang === 'pt') {
-                langPtBtn.classList.add('active');
-                langEnBtn.classList.remove('active');
-            } else {
-                langEnBtn.classList.add('active');
-                langPtBtn.classList.remove('active');
-            }
-        };
+            // Close menu when a link is clicked
+            navMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('active');
+                    const icon = menuToggle.querySelector('i');
+                    icon.classList.add('fa-bars');
+                    icon.classList.remove('fa-times');
+                });
+            });
 
-        langPtBtn.addEventListener('click', () => changeLanguage('pt'));
-        langEnBtn.addEventListener('click', () => changeLanguage('en'));
 
-        // Set initial language to English
-        changeLanguage('en');
+            // --- 7. Translation Logic (Unchanged from original) ---
+            const translations = {
+                pt: {
+                    navHome: 'Início',
+                    navAbout: 'Sobre',
+                    navTech: 'Tecnologias',
+                    navCareer: 'Carreira',
+                    navContact: 'Contato',
+                    navProjects: 'Projetos',
+                    typingEffect: ['Desenvolvedor &amp; Engenheiro de Backend', 'Engenheiro de Software', 'Java | PHP | Go | Progress ABL'],
+                    explore: 'Explore',
+                    aboutTitle: 'SOBRE MIM',
+                    aboutP1: 'Olá! Sou estudante de Engenharia de Computação na FIAP e um desenvolvedor Backend apaixonado por construir sistemas robustos e escaláveis. Com experiência em <strong>Java, PHP e Go</strong>, meu foco é criar arquiteturas de software eficientes, aplicando conceitos como <strong>DDD, Microsserviços e APIs RESTful</strong>.',
+                    aboutP2: 'Tenho familiaridade com ambientes <strong>Cloud (AWS)</strong>, práticas de <strong>CI/CD</strong> e gerenciamento de infraestrutura com <strong>Nginx e Docker</strong>. Sou um profissional proativo, fluente em inglês e sempre em busca de novos desafios para aprimorar minhas habilidades.',
+                    techTitle: 'TECNOLOGIAS',
+                    careerTitle: 'CARREIRA & EDUCAÇÃO',
+                    job1Title: 'Engenheiro e Desenvolvedor Backend',
+                    job1Desc: 'Responsável pelo desenvolvimento e manutenção de sistemas backend de alta performance.',
+                    job2Title: 'Desenvolvedor Backend Java',
+                    job2Desc: 'Atuei na criação de APIs e microsserviços utilizando o ecossistema Spring.',
+                    edu1Title: 'Engenharia de Software',
+                    edu1Desc: 'Aprofundando conhecimentos em arquitetura de software, engenharia e gestão de projetos.',
+                    edu2Title: 'Engenharia da Computação',
+                    edu2Desc: 'Base sólida em hardware, software, redes e sistemas embarcados.',
+                    projectsTitle: 'PROJETOS',
+                    proj1Title: 'ModularPHP',
+                    proj1Desc: 'Um template robusto e escalável para a construção de novas APIs em PHP, projetado com uma arquitetura modular e boas práticas de desenvolvimento. Inclui ambiente Dockerizado, observabilidade com OpenTelemetry e autenticação JWT.',
+                    proj2Title: 'Microsserviço CompileActions',
+                    proj2Desc: 'Um microsserviço orientado por webhooks que se integra ao GitHub Actions para automatizar compilações multiplataforma. Ele detecta inteligentemente a linguagem de programação dos arquivos modificados e aciona os pipelines de compilação e implantação correspondentes.',
+                    contactTitle: 'CONTATO',
+                    contactSubtitle: 'Vamos construir algo incrível juntos? Entre em contato!',
+                    footerRights: '&copy; 2025 Felipe Meneguzzi. Todos os direitos reservados.',
+                },
+                en: {
+                    navHome: 'Home',
+                    navAbout: 'About',
+                    navTech: 'Technologies',
+                    navCareer: 'Career',
+                    navProjects: 'Projects',
+                    navContact: 'Contact',
+                    typingEffect: ['Backend Developer &amp; Engineer', 'Software Engineer', 'Java | PHP | Go | Progress ABL'],
+                    explore: 'Explore',
+                    aboutTitle: 'ABOUT ME',
+                    aboutP1: 'Hello! I am a Computer Engineering student at FIAP and a Backend developer passionate about building robust and scalable systems. With experience in <strong>Java, PHP, and Go</strong>, my focus is on creating efficient software architectures, applying concepts like <strong>DDD, Microservices, and RESTful APIs</strong>.',
+                    aboutP2: 'I am familiar with <strong>Cloud environments (AWS)</strong>, <strong>CI/CD</strong> practices, and infrastructure management with <strong>Nginx and Docker</strong>. I am a proactive professional, fluent in English, and always seeking new challenges to enhance my skills.',
+                    techTitle: 'TECHNOLOGIES',
+                    careerTitle: 'CAREER & EDUCATION',
+                    job1Title: 'Backend Engineer & Developer',
+                    job1Desc: 'Responsible for the development and maintenance of high-performance backend systems.',
+                    job2Title: 'Java Backend Developer',
+                    job2Desc: 'Worked on creating APIs and microservices using the Spring ecosystem.',
+                    edu1Title: 'Software Engineering',
+                    edu1Desc: 'Deepening knowledge in software architecture, engineering, and project management.',
+                    edu2Title: 'Computer Engineering',
+                    edu2Desc: 'Solid foundation in hardware, software, networks, and embedded systems.',
+                    projectsTitle: 'PROJECTS',
+                    proj1Title: 'ModularPHP',
+                    proj1Desc: 'A robust and scalable template for building new APIs in PHP, designed with a modular architecture and good development practices. Includes a Dockerized environment, observability with OpenTelemetry, and JWT authentication.',
+                    proj2Title: 'CompileActions Microservice',
+                    proj2Desc: 'A webhook-driven microservice that integrates with GitHub Actions to automate multi-platform builds. It intelligently detects the programming language of modified files and triggers the corresponding compilation and deployment pipelines.',
+                    contactTitle: 'CONTACT',
+                    contactSubtitle: 'Let\'s build something amazing together? Get in touch!',
+                    footerRights: '&copy; 2025 Felipe Meneguzzi. All rights reserved.',
+                }
+            };
 
-        // --- Original Technologies Logic (unchanged) ---
-        const technologies = [
-            { name: 'Java', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg' },
-            { name: 'Spring', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg' },
-            { name: 'Gradle', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/gradle/gradle-original.svg' },
-            { name: 'Maven', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/maven/maven-original.svg' },
-            { name: 'PHP', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg' },
-            { name: 'Laravel', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/laravel/laravel-original.svg' },
-            { name: 'Composer', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/composer/composer-original.svg' },
-            { name: 'Apache', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/apache/apache-original.svg' },
-            { name: 'Progress ABL', icon: 'https://camo.githubusercontent.com/515239f29984726c9c8bb33d56267206b941b526ae8272db809c337f4dd551a5/68747470733a2f2f7a76672e67616c6c65727963646e2e76736173736574732e696f2f657874656e73696f6e732f7a76672f7673636f64652d6f6561626c2f302e322e322f313437363335353136373034392f4d6963726f736f66742e56697375616c53747564696f2e53657276696365732e49636f6e732e44656661756c74' },
-            { name: 'Go', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg' },
-            { name: 'MySQL', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg' },
-            { name: 'PostgreSQL', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg' },
-            { name: 'Redis', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg' },
-            { name: 'Git', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg' },
-            { name: 'GitActions', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/githubactions/githubactions-original.svg' },
-            { name: 'Docker', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg' },
-            { name: 'Kubernetes', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-original.svg' },
-            { name: 'AWS', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg' },
-            { name: 'Nginx', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg' },
-            { name: 'Cloudflare', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cloudflare/cloudflare-original.svg' },
-            { name: 'Dbeaver', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/dbeaver/dbeaver-original.svg' },
-            { name: 'OpenTelemetry', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opentelemetry/opentelemetry-original.svg' },
-        ];
-        
-        const techGrid = document.querySelector('.tech-grid');
-        technologies.forEach((tech, index) => {
-            const delay = index * 50;
-            const card = document.createElement('div');
-            card.className = 'tech-card';
-            card.setAttribute('data-aos', 'fade-up');
-            card.setAttribute('data-aos-delay', delay);
-            card.innerHTML = `
-                <img src="${tech.icon}" alt="${tech.name}" style="width: 80px; height: 80px; object-fit: contain;">
-                <p>${tech.name}</p>
-            `;
+            const langPtBtn = document.getElementById('lang-pt');
+            const langEnBtn = document.getElementById('lang-en');
+            let typedInstance = null;
 
-            techGrid.appendChild(card);
+            const changeLanguage = (lang) => {
+                document.documentElement.lang = lang;
+                const langData = translations[lang];
+
+                document.querySelectorAll('[data-key]').forEach(element => {
+                    const key = element.getAttribute('data-key');
+                    if (langData[key]) {
+                        element.innerHTML = langData[key];
+                    }
+                });
+
+                // Re-initialize Typed.js for the new language
+                if (typedInstance) {
+                    typedInstance.destroy();
+                }
+                typedInstance = new Typed('#typing-effect', {
+                    strings: langData.typingEffect,
+                    typeSpeed: 70,
+                    backSpeed: 50,
+                    loop: true,
+                    smartBackspace: true,
+                });
+
+                if (lang === 'pt') {
+                    langPtBtn.classList.add('active');
+                    langEnBtn.classList.remove('active');
+                } else {
+                    langEnBtn.classList.add('active');
+                    langPtBtn.classList.remove('active');
+                }
+            };
+
+            langPtBtn.addEventListener('click', () => changeLanguage('pt'));
+            langEnBtn.addEventListener('click', () => changeLanguage('en'));
+
+            // Set initial language to English
+            changeLanguage('en');
+
+
+            // --- 8. Original Technologies Logic (Unchanged) ---
+            const technologies = [
+                { name: 'Java', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg' },
+                { name: 'Spring', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg' },
+                { name: 'Gradle', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/gradle/gradle-original.svg' },
+                { name: 'Maven', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/maven/maven-original.svg' },
+                { name: 'PHP', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg' },
+                { name: 'Laravel', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/laravel/laravel-original.svg' },
+                { name: 'Composer', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/composer/composer-original.svg' },
+                { name: 'Apache', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/apache/apache-original.svg' },
+                { name: 'Progress ABL', icon: 'https://camo.githubusercontent.com/515239f29984726c9c8bb33d56267206b941b526ae8272db809c337f4dd551a5/68747470733a2f2f7a76672e67616c6c65727963646e2e76736173736574732e6f2f657874656e73696f6e732f7a76672f7673636f64652d6f6561626c2f302e322e322f313437363335353136373034392f4d6963726f736f66742e56697375616c53747564696f2e53657276696365732e49636f6e732e44656661756c74' },
+                { name: 'Go', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg' },
+                { name: 'MySQL', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg' },
+                { name: 'PostgreSQL', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg' },
+                { name: 'Redis', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg' },
+                { name: 'Git', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg' },
+                { name: 'GitActions', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/githubactions/githubactions-original.svg' },
+                { name: 'Docker', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg' },
+                { name: 'Kubernetes', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-original.svg' },
+                { name: 'AWS', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg' },
+                { name: 'Nginx', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg' },
+                { name: 'Cloudflare', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cloudflare/cloudflare-original.svg' },
+                { name: 'Dbeaver', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/dbeaver/dbeaver-original.svg' },
+                { name: 'OpenTelemetry', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opentelemetry/opentelemetry-original.svg' },
+            ];
+            
+            const techGrid = document.querySelector('.tech-grid');
+            technologies.forEach((tech, index) => {
+                const delay = index * 50; // Stagger animation
+                const card = document.createElement('div');
+                card.className = 'tech-card';
+                card.setAttribute('data-aos', 'fade-up');
+                card.setAttribute('data-aos-delay', delay);
+                card.innerHTML = `
+                    <img src="${tech.icon}" alt="${tech.name}" style="width: 50px; height: 50px; object-fit: contain;">
+                    <p>${tech.name}</p>
+                `;
+
+                techGrid.appendChild(card);
+            });
         });
     </script>
 </body>
